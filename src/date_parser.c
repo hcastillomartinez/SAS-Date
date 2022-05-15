@@ -1,5 +1,6 @@
 #include "date_parser.h"
 
+
 static int sub_validate(char * str, int sz, char seperator, int min, int max)
 {
     char *tmp = calloc(1, sz + 1);
@@ -46,55 +47,55 @@ int validate_date(char * str)
     if (sz == 25 || sz == 20)
     {
         // year
-        res = sub_validate(date, 5, '-', 0, 9999);
+        res = sub_validate(date, 5, '-', 0, MAX_YEAR);
         date += 5;
         if (!res)
             goto cleanup;
         
         // month
-        res = sub_validate(date, 3, '-', 1, 12);
+        res = sub_validate(date, 3, '-', 1, MAX_MONTH);
         date += 3;
         if (!res)
             goto cleanup;
         // day
-        res = sub_validate(date, 3, 'T', 1, 31);
+        res = sub_validate(date, 3, 'T', 1, MAX_DAY);
         date += 3;
         if (!res)
             goto cleanup;
             
         // hour
-        res = sub_validate(date, 3, ':', 0, 23);
+        res = sub_validate(date, 3, ':', 0, MAX_HOUR);
         date += 3;
         if (!res)
             goto cleanup;
         
         // minutes
-        res = sub_validate(date, 3, ':', 0, 59);
+        res = sub_validate(date, 3, ':', 0, MAX_MINUTE);
         date += 3;
         if (!res)
             goto cleanup;
         
-        // validate tzd, 3 alternatives.
-        res = sub_validate(date, 3, 'Z', 0, 59);
+        // validate tzd, 3 alternatives. (Seconds)
+        res = sub_validate(date, 3, 'Z', 0, MAX_SECONDS);
         if (res)
             goto cleanup;
         
-        res = sub_validate(date, 3, '+', 0, 59);
+        res = sub_validate(date, 3, '+', 0, MAX_SECONDS);
         if(!res)
-            res = sub_validate(date, 3, '-', 0, 59);
+            res = sub_validate(date, 3, '-', 0, MAX_SECONDS);
             if(!res)
                 goto cleanup;
         
         date += 3;
         
         // hour
-        res = sub_validate(date, 3, ':', 0, 23);
+        res = sub_validate(date, 3, ':', 0, MAX_HOUR);
         date += 3;
         if (!res)
             goto cleanup;
         
         // minutes
-        res = sub_validate(date, 3, '\0', 0, 59);
+        res = sub_validate(date, 3, '\0', 0, MAX_MINUTE);
         if (!res)
             goto cleanup;
   }
