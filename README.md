@@ -1,1 +1,2 @@
 # SAS-Date
+Program that reads a large list of date-time values from a file and writes to a separate file the list of unique, valid date-time values (no duplicates). A valid date-time value follows the format ISO 8601.
