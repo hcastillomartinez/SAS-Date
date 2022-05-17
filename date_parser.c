@@ -13,7 +13,7 @@ static int sub_validate(char *str, int sz, char seperator, int min, int max) {
         goto cleanup;
     }
 
-    if (*pEnd == seperator && strlen(pEnd) == 1) {
+    if ((*pEnd == seperator && strlen(pEnd) == 1) || (*pEnd == seperator && seperator == '\0')) {
         if (num < min || num > max) {
             // printf("out of range\n");
             goto cleanup;

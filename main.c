@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     errno = 0;
     count = strtol(argv[1], &rest, 10);
     if (errno != 0 || *rest != '\0') {
-        printf("Invalid value for count\n");
+        printf("Invalid value for count %d\n", errno);
         return 1;
     }
 
@@ -56,8 +56,10 @@ int main(int argc, char *argv[]) {
     }
 
     while ((read = getline(&line, &len, fp)) != -1) {
-        if (line[read - 1] == '\n')
+        if (line[read - 1] == '\n') {
             line[read - 1] = '\0'; // drop the \n
+        }
+
         ret = validate_date(line);
         if (ret) {
             ret = add_item(t, line);
