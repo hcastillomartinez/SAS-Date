@@ -5,41 +5,41 @@
 int main(void) {
 
   HashTable *t = NULL;
-  t = create_table(10000);
-  if (t != NULL)
-  {
-    printf("Have a table!\n");
-  }
-
   FILE * fp;
+  FILE *out_fp;
   char * line = NULL;
   size_t len = 0;
   ssize_t read;
-
-  fp = fopen("./dates.txt", "r");
   int ret = 0;
+
+
+  t = create_table(1000000);
+  if (t == NULL)
+    goto cleanup;
+  
+  fp = fopen("./valid_dates.txt", "r");
+  out_fp = fopen("./out_file.txt", "w");
+
   while ((read = getline(&line, &len, fp)) != -1) {
       // printf("Retrieved line of length %zu:\n", read);
       line[read-1] = '\0';
-      printf("%s\n", line);
+      // printf("%s\n", line);
       ret = validate_date(line);
       if (ret)
       {
         ret = add_item(t, line);
         if (ret)
-          printf("Added date = %d\n", ret);
-        else
-          printf("Collision\n");
+          fprintf(out_fp, "%s\n", line);
       }
   }
 
-  fclose(fp);
 
-  destroy_table(&t);
-
-  if (t == NULL)
-  {
-    printf("Table is destroyed!\n");
-  }
+cleanup:
+  if (fp != NULL)
+    fclose(fp);
+  if (out_fp != NULL)
+    fclose(out_fp);
+  if (t!= NULL)
+    destroy_table(&t);
   return 0;
 }

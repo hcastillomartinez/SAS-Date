@@ -100,7 +100,7 @@ int add_item(HashTable *table, const char * string)
   memcpy(element->string, string, str_sz);
   element->hash = FNV_hash(string, str_sz);
 
-  printf("String %s\nHash = %u\n", string, hash);
+  // printf("String %s\nHash = %u\n", string, hash);
   table->table[index] = element;
   
 cleanup:

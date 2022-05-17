@@ -3,7 +3,7 @@ build:
 		echo "Building date parser"
 		mkdir -p build &&\
 		rm -rf out/* &&\
-		./generator.py &&\
+		./generator.py 100000 &&\
 		cd build &&\
 		cmake .. &&\
 		make
