@@ -7,7 +7,13 @@ static int sub_validate(char *str, int sz, char seperator, int min, int max) {
     memcpy(tmp, str, sz);
     long int num = strtol(tmp, &pEnd, 10);
     int res = 0;
-    if (*pEnd == seperator) {
+
+    if (tmp[sz - 1] != seperator) {
+        // printf("Not valid seperator\n");
+        goto cleanup;
+    }
+
+    if (*pEnd == seperator && strlen(pEnd) == 1) {
         if (num < min || num > max) {
             // printf("out of range\n");
             goto cleanup;
@@ -15,10 +21,6 @@ static int sub_validate(char *str, int sz, char seperator, int min, int max) {
         // printf("num = %ld\n", num);
     } else {
         // printf("Not expected size for string %s\n", pEnd);
-        goto cleanup;
-    }
-    if (tmp[sz - 1] != seperator) {
-        // printf("Not valid seperator\n");
         goto cleanup;
     }
     // printf("valid sub date!\n");
