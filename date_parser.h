@@ -7,4 +7,5 @@
 #define MAX_HOUR 23
 #define MAX_MINUTE 59
 #define MAX_SECONDS 59
-int validate_date(char * str);
+
+int validate_date(char *str);
