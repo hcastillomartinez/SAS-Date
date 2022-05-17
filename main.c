@@ -56,7 +56,8 @@ int main(int argc, char *argv[]) {
     }
 
     while ((read = getline(&line, &len, fp)) != -1) {
-        line[read - 1] = '\0'; // drop the \n
+        if (line[read - 1] == '\n')
+            line[read - 1] = '\0'; // drop the \n
         ret = validate_date(line);
         if (ret) {
             ret = add_item(t, line);
