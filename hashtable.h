@@ -7,6 +7,7 @@ typedef struct HashElement_
 {
   char *string;
   uint32_t hash;
+  struct HashElement_ *next;
 }HashElement;
 
 typedef struct HashTable_

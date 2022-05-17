@@ -16,6 +16,11 @@ static uint32_t FNV_hash(const void* key, int len)
     return h;
 }
 
+void test_hash (char * str)
+{
+  printf("test hash = %u\n", FNV_hash(str, strlen(str)));
+}
+
 static void free_element(HashElement * el)
 {
   memset(el->string, 0, strlen(el->string));
@@ -67,6 +72,54 @@ void destroy_table(HashTable **table)
   *table = NULL;
 }
 
+static int handle_collision(HashElement *element, const char * string, uint32_t hash)
+{
+  int ret = 0;
+  HashElement *tmp = element;
+
+  if (tmp->hash == hash)
+    goto cleanup;
+
+  while(tmp->next != NULL)
+  {
+    // look for hash
+    if (tmp->hash == hash)
+    {
+      printf("exists in the chain\n");
+      goto cleanup;
+    }
+    printf("hash = %u\nsearch hash %u\nstring = %s\nsearch string = %s\n", tmp->hash, hash, tmp->string, string);
+    tmp = tmp->next;
+  }
+
+  
+  printf("adding to %u %s chain\n", hash, string);
+  // assume it wasnt found, chain it.
+  tmp->next = calloc(1, sizeof(HashElement));
+  if (tmp->next == NULL)
+  {
+    goto cleanup;
+  }
+
+  size_t str_sz = strlen(string);
+  tmp->next->string = calloc(1, str_sz + 1);
+  if (tmp->next->string == NULL)
+  {
+    goto cleanup;
+  }
+  
+  memcpy(tmp->next->string, string, str_sz);
+  tmp->next->hash = hash;
+
+  tmp->next->next = NULL;
+
+  ret = 1;
+
+cleanup:
+  return ret;
+}
+
+
 int add_item(HashTable *table, const char * string)
 {
   int ret = 1;
@@ -79,7 +132,16 @@ int add_item(HashTable *table, const char * string)
   // check if index exists
   if (table->table[index] != NULL)
   {
-    ret = 0;
+    HashElement* el = table->table[index];
+    if (el->hash == hash)
+      ret = 0;
+    else
+    {
+      printf("\nindex = %d\n", index);
+      ret = handle_collision(table->table[index], string, hash);
+      if (ret)
+        printf("succesful collision\n");
+    }
     goto cleanup;
   }
   
@@ -99,6 +161,8 @@ int add_item(HashTable *table, const char * string)
   
   memcpy(element->string, string, str_sz);
   element->hash = FNV_hash(string, str_sz);
+
+  element->next = NULL;
 
   // printf("String %s\nHash = %u\n", string, hash);
   table->table[index] = element;
