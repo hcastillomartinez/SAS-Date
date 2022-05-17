@@ -1,29 +1,29 @@
 #include "date_parser.h"
 
 
-static int sub_validate(char *str, int sz, char seperator, int min, int max) {
+static int sub_validate(char *str, int sz, char separator, int min, int max) {
     char *tmp = calloc(1, sz + 1);
     char *pEnd;
     memcpy(tmp, str, sz);
     long int num = strtol(tmp, &pEnd, 10);
     int res = 0;
 
-    if (tmp[sz - 1] != seperator) {
-        // printf("Not valid seperator\n");
+    if (tmp[sz - 1] != separator) {
+        // separator not valid
         goto cleanup;
     }
 
-    if ((*pEnd == seperator && strlen(pEnd) == 1) || (*pEnd == seperator && seperator == '\0')) {
+    // check that end is only the separator and is of expected size (1 or 0 if the end)
+    if ((*pEnd == separator && strlen(pEnd) == 1)
+        || (*pEnd == separator && separator == '\0' && strlen(pEnd) == 0)) {
         if (num < min || num > max) {
-            // printf("out of range\n");
+            // number of out range
             goto cleanup;
         }
-        // printf("num = %ld\n", num);
     } else {
-        // printf("Not expected size for string %s\n", pEnd);
+        // pEnd is larger than expected or not the correct separator
         goto cleanup;
     }
-    // printf("valid sub date!\n");
     res = 1;
     cleanup:
     free(tmp);
@@ -39,6 +39,7 @@ int validate_date(char *str) {
 
     size_t sz = strlen(str);
 
+    // if not valid size just toss
     if (sz == 25 || sz == 20) {
         // year
         res = sub_validate(date, 5, '-', 0, MAX_YEAR);
@@ -92,8 +93,6 @@ int validate_date(char *str) {
         res = sub_validate(date, 3, '\0', 0, MAX_MINUTE);
         if (!res)
             goto cleanup;
-    } else {
-        // printf("Wrong size\n");
     }
     cleanup:
     return res;

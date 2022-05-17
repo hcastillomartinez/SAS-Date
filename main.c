@@ -60,11 +60,12 @@ int main(int argc, char *argv[]) {
             line[read - 1] = '\0'; // drop the \n
         }
 
+        // validate date
         ret = validate_date(line);
         if (ret) {
-            ret = add_item(t, line);
+            ret = add_item(t, line);  // verify uniqueness
             if (ret)
-                fprintf(out_fp, "%s\n", line);
+                fprintf(out_fp, "%s\n", line);  // write to out file
         }
     }
 

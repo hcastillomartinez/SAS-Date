@@ -15,4 +15,4 @@ clean:
 .PHONY: test
 test:
 		cd out &&\
-		./date-parser 1000
+		./date-parser 200

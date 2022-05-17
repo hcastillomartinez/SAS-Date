@@ -55,6 +55,7 @@ HashTable *create_table(uint size) {
 }
 
 void destroy_table(HashTable **table) {
+    // free elements from the table and respective chains
     for (int i = 0; i < (*table)->size; i++) {
         HashElement *el = (*table)->table[i];
         if (el != NULL) {
@@ -62,7 +63,7 @@ void destroy_table(HashTable **table) {
             el = NULL;
         }
     }
-
+    // free the table and Hashtable
     memset((*table)->table, 0, (*table)->size * sizeof(HashElement));
     free((*table)->table);
 
@@ -71,9 +72,9 @@ void destroy_table(HashTable **table) {
     *table = NULL;
 }
 
-static int handle_collision(HashElement **element, const char *string, uint32_t hash) {
+static int handle_collision(HashElement *element, const char *string, uint32_t hash) {
     int ret = 0;
-    HashElement *tmp = *element;
+    HashElement *tmp = element;
 
     if (tmp->hash == hash)
         goto cleanup;
@@ -81,15 +82,13 @@ static int handle_collision(HashElement **element, const char *string, uint32_t 
     while (tmp->next != NULL) {
         // look for hash
         if (tmp->next->hash == hash) {
-//      printf("exists in the chain\n");
+            // hash exists in the chain already
             goto cleanup;
         }
-//    printf("hash = %u\nsearch hash %u\nstring = %s\nsearch string = %s\n", tmp->hash, hash, tmp->string, string);
         tmp = tmp->next;
     }
 
     HashElement *new = NULL;
-//  printf("adding to %u %s chain\n", hash, string);
     // assume it wasnt found, chain it.
     new = calloc(1, sizeof(HashElement));
     if (new == NULL) {
@@ -99,6 +98,7 @@ static int handle_collision(HashElement **element, const char *string, uint32_t 
     size_t str_sz = strlen(string);
     new->string = calloc(1, str_sz + 1);
     if (new->string == NULL) {
+        free(new);
         goto cleanup;
     }
 
@@ -124,10 +124,11 @@ int add_item(HashTable *table, const char *string) {
 
     // check if index exists
     if (table->table[index] != NULL) {
-        ret = handle_collision(&(table->table[index]), string, hash);
+        ret = handle_collision(table->table[index], string, hash);
         goto cleanup;
     }
 
+    // adding new element to index
     element = calloc(1, sizeof(HashElement));
     if (element == NULL) {
         ret = 0;
@@ -136,6 +137,7 @@ int add_item(HashTable *table, const char *string) {
 
     element->string = calloc(1, str_sz + 1);
     if (element->string == NULL) {
+        free(element);
         ret = 0;
         goto cleanup;
     }
@@ -145,7 +147,6 @@ int add_item(HashTable *table, const char *string) {
 
     element->next = NULL;
 
-    // printf("String %s\nHash = %u\n", string, hash);
     table->table[index] = element;
 
     cleanup:
