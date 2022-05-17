@@ -2,7 +2,7 @@
 
 #define SEED 0x1234567
 
-static uint32_t FNV_hash(const void* key, int len)
+static uint32_t FNV_hash(const void* key, size_t len)
 {
     uint32_t h = SEED;
     // Source: https://github.com/aappleby/smhasher/blob/master/src/Hashes.cpp
@@ -23,9 +23,16 @@ void test_hash (char * str)
 
 static void free_element(HashElement * el)
 {
-  memset(el->string, 0, strlen(el->string));
-  free(el->string);
-  free(el);
+  HashElement *tmp = el;
+  HashElement *next = NULL;
+  while(tmp != NULL)
+  {
+      next = tmp->next;
+      memset(tmp->string, 0, strlen(tmp->string));
+      free(tmp->string);
+      free(tmp);
+      tmp = next;
+  }
 }
 
 HashTable* create_table(uint size)
@@ -61,7 +68,10 @@ void destroy_table(HashTable **table)
   {
       HashElement* el = (*table)->table[i];
       if (el != NULL)
-          free_element(el);   
+      {
+          free_element(el);
+          el = NULL;
+      }
   }
 
   memset((*table)->table, 0, (*table)->size * sizeof(HashElement));
@@ -72,10 +82,10 @@ void destroy_table(HashTable **table)
   *table = NULL;
 }
 
-static int handle_collision(HashElement *element, const char * string, uint32_t hash)
+static int handle_collision(HashElement **element, const char * string, uint32_t hash)
 {
   int ret = 0;
-  HashElement *tmp = element;
+  HashElement *tmp = *element;
 
   if (tmp->hash == hash)
     goto cleanup;
@@ -83,42 +93,42 @@ static int handle_collision(HashElement *element, const char * string, uint32_t 
   while(tmp->next != NULL)
   {
     // look for hash
-    if (tmp->hash == hash)
+    if (tmp->next->hash == hash)
     {
-      printf("exists in the chain\n");
+//      printf("exists in the chain\n");
       goto cleanup;
     }
-    printf("hash = %u\nsearch hash %u\nstring = %s\nsearch string = %s\n", tmp->hash, hash, tmp->string, string);
+//    printf("hash = %u\nsearch hash %u\nstring = %s\nsearch string = %s\n", tmp->hash, hash, tmp->string, string);
     tmp = tmp->next;
   }
 
-  
-  printf("adding to %u %s chain\n", hash, string);
+  HashElement * new = NULL;
+//  printf("adding to %u %s chain\n", hash, string);
   // assume it wasnt found, chain it.
-  tmp->next = calloc(1, sizeof(HashElement));
-  if (tmp->next == NULL)
+  new = calloc(1, sizeof(HashElement));
+  if (new == NULL)
   {
     goto cleanup;
   }
 
   size_t str_sz = strlen(string);
-  tmp->next->string = calloc(1, str_sz + 1);
-  if (tmp->next->string == NULL)
+  new->string = calloc(1, str_sz + 1);
+  if (new->string == NULL)
   {
     goto cleanup;
   }
   
-  memcpy(tmp->next->string, string, str_sz);
-  tmp->next->hash = hash;
+  memcpy(new->string, string, str_sz);
+  new->hash = hash;
 
-  tmp->next->next = NULL;
+  new->next = NULL;
+  tmp->next = new;
 
   ret = 1;
 
 cleanup:
   return ret;
 }
-
 
 int add_item(HashTable *table, const char * string)
 {
@@ -132,16 +142,7 @@ int add_item(HashTable *table, const char * string)
   // check if index exists
   if (table->table[index] != NULL)
   {
-    HashElement* el = table->table[index];
-    if (el->hash == hash)
-      ret = 0;
-    else
-    {
-      printf("\nindex = %d\n", index);
-      ret = handle_collision(table->table[index], string, hash);
-      if (ret)
-        printf("succesful collision\n");
-    }
+    ret = handle_collision(&(table->table[index]), string, hash);
     goto cleanup;
   }
   
