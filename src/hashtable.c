@@ -2,6 +2,14 @@
 
 #define SEED 0x1234567
 
+/**
+ * FNV hashes are designed to be fast while maintaining a low collision rate.
+ * The high dispersion of the FNV hashes makes them well suited for hashing nearly
+ * identical strings such as URLs, hostnames, filenames, text, IP addresses, etc.
+ * @param key (const void*), key to get hash value from.
+ * @param len (size_t), length of the key.
+ * @return hash value of the Key (uint32_t)
+ */
 static uint32_t FNV_hash(const void *key, size_t len) {
     uint32_t h = SEED;
     // Source: https://github.com/aappleby/smhasher/blob/master/src/Hashes.cpp
@@ -14,7 +22,10 @@ static uint32_t FNV_hash(const void *key, size_t len) {
     return h;
 }
 
-
+/**
+ * Frees the HashElement and its chain.
+ * @param el (HashElement *), HashElement to free
+ */
 static void free_element(HashElement *el) {
     HashElement *tmp = el;
     HashElement *next = NULL;
@@ -27,6 +38,11 @@ static void free_element(HashElement *el) {
     }
 }
 
+/**
+ * Creates hashtable with number of buckets specified.
+ * @param size (uint), number of buckets to create.
+ * @return NULL if error occurred otherwise pointer to HashTable
+ */
 HashTable *create_table(uint size) {
     HashTable *table = NULL;
     table = calloc(1, sizeof(HashTable));
@@ -51,6 +67,10 @@ HashTable *create_table(uint size) {
     return table;
 }
 
+/**
+ * Frees the entire HashTable and sets to NULL.
+ * @param table (HashTable **), hashtable to free
+ */
 void destroy_table(HashTable **table) {
     // free elements from the buckets and respective chains
     for (int i = 0; i < (*table)->size; i++) {
@@ -69,6 +89,13 @@ void destroy_table(HashTable **table) {
     *table = NULL;
 }
 
+/**
+ * Handle collision that occurs at HashElement (bucket) using chaining.
+ * @param element (HashElement *), bucket to potentially add new element to its chain.
+ * @param string (const char *), string of potential item to add.
+ * @param hash (uint32_t), hash of the string of the potential item to add.
+ * @return 1 on success else 0.
+ */
 static int handle_collision(HashElement *element, const char *string, uint32_t hash) {
     int ret = 0;
     HashElement *tmp = element;
@@ -111,6 +138,12 @@ static int handle_collision(HashElement *element, const char *string, uint32_t h
     return ret;
 }
 
+/**
+ * Adds an item to the HashTable.
+ * @param table (HashTable *), table to add item to.
+ * @param string (const char *), item to add to table.
+ * @return 1 on success else 0.
+ */
 int add_item(HashTable *table, const char *string) {
     int ret = 1;
     HashElement *element = NULL;

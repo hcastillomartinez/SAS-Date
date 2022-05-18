@@ -1,6 +1,14 @@
 #include "date_parser.h"
 
-
+/**
+ * Takes a sub-date string in the format expected int values and separator. (e.g "2021-", "21-", "23:", etc)
+ * @param str (char *), sub-date string to validate.
+ * @param sz (int), number of chars to expect sub-date string to be.
+ * @param separator (char), expected last char of sub-date
+ * @param min (int), min value for sub-date
+ * @param max (int), max value for sub-date
+ * @return 1 on success else 0.
+ */
 static int sub_validate(char *str, int sz, char separator, int min, int max) {
     char *tmp = calloc(1, sz + 1);
     char *pEnd;
@@ -31,8 +39,10 @@ static int sub_validate(char *str, int sz, char separator, int min, int max) {
 }
 
 /**
-* Validates date string is in format of ISO 8601
-*/
+ * Validates date string is in format of ISO 8601. Does not validate date is semantically correct.
+ * @param str (char *), date string to validate.
+ * @return 1 on success else 0.
+ */
 int validate_date(char *str) {
     int res = 0;
     char *date = str;
