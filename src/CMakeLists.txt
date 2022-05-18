@@ -4,8 +4,6 @@ file(GLOB HDR "${PROJECT_SOURCE_DIR}/include/*.h")
 
 add_executable(${OUT_NAME} ${SRC} ${HDR})
 
-set(OUT_DIR ${PROJECT_SOURCE_DIR}/out)
-
 message(STATUS "output dir: ${OUT_DIR}")
 
 target_include_directories(${OUT_NAME} PRIVATE
