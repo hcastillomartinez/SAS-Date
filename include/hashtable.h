@@ -10,7 +10,7 @@ typedef struct HashElement_ {
 } HashElement;
 
 typedef struct HashTable_ {
-    HashElement **table;
+    HashElement **buckets;
     uint size;
     uint count;
 } HashTable;

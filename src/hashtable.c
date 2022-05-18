@@ -40,32 +40,32 @@ HashTable *create_table(uint size) {
     table->count = 0;
     table->size = size;
 
-    table->table = (HashElement **) calloc(size, sizeof(HashElement));
-    if (table->table == NULL) {
+    table->buckets = (HashElement **) calloc(size, sizeof(HashElement));
+    if (table->buckets == NULL) {
         free(table);
         table = NULL;
         goto cleanup;
     }
 
     for (int i = 0; i < table->size; i++)
-        table->table[i] = NULL;
+        table->buckets[i] = NULL;
 
     cleanup:
     return table;
 }
 
 void destroy_table(HashTable **table) {
-    // free elements from the table and respective chains
+    // free elements from the buckets and respective chains
     for (int i = 0; i < (*table)->size; i++) {
-        HashElement *el = (*table)->table[i];
+        HashElement *el = (*table)->buckets[i];
         if (el != NULL) {
             free_element(el);
             el = NULL;
         }
     }
-    // free the table and Hashtable
-    memset((*table)->table, 0, (*table)->size * sizeof(HashElement));
-    free((*table)->table);
+    // free the buckets and Hashtable
+    memset((*table)->buckets, 0, (*table)->size * sizeof(HashElement));
+    free((*table)->buckets);
 
     memset(*table, 0, sizeof(HashTable));
     free(*table);
@@ -123,8 +123,8 @@ int add_item(HashTable *table, const char *string) {
     uint index = (hash) % (table->size);
 
     // check if index exists
-    if (table->table[index] != NULL) {
-        ret = handle_collision(table->table[index], string, hash);
+    if (table->buckets[index] != NULL) {
+        ret = handle_collision(table->buckets[index], string, hash);
         goto cleanup;
     }
 
@@ -147,7 +147,7 @@ int add_item(HashTable *table, const char *string) {
 
     element->next = NULL;
 
-    table->table[index] = element;
+    table->buckets[index] = element;
 
     cleanup:
     return ret;

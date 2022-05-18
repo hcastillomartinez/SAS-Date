@@ -14,7 +14,7 @@ is also standalone and amount of records desired is the only argument eg `./gene
 Additionaly, `make clean` is provided to clear out generated files and cmake cache files.
 
 ## Running
-The program takes 2 arguments. First is **count** (required) which determines the size of the hash table used to verify uniqueness.
+The program takes 2 arguments. First is **count** (required) which determines the size of the number of buckets in the hashtable that is used to verify uniqueness.
  Second (optional) is **path** which is the fully qualified or relative path to file.
 
 
