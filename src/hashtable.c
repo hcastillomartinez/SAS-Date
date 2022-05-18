@@ -14,9 +14,6 @@ static uint32_t FNV_hash(const void *key, size_t len) {
     return h;
 }
 
-void test_hash(char *str) {
-    printf("test hash = %u\n", FNV_hash(str, strlen(str)));
-}
 
 static void free_element(HashElement *el) {
     HashElement *tmp = el;

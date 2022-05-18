@@ -16,12 +16,8 @@ typedef struct HashTable_ {
 } HashTable;
 
 
-void test_hash(char *string);
-
 HashTable *create_table(uint size);
 
 void destroy_table(HashTable **table);
 
 int add_item(HashTable *table, const char *string);
-
-int remove_item(HashTable *table, const char *string);
